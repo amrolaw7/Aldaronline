@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الدار أونلاين - لوحة المعلم التشغيلية المتقدمة</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+            direction: rtl;
+            overflow-x: hidden;
+        }
+
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background-color: var(--card-bg) !important;
+            color: #ffffff !important;
+            font-size: 16px;
+        }
+
+        .form-group select option {
+            background-color: var(--card-bg) !important;
+            color: #ffffff !important;
+            padding: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        #app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        sidebar {
+            width: 280px;
+            background-color: var(--card-bg);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--accent-color);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 10px 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: var(--text-muted);
+            font-size: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .sidebar-menu li:hover, .sidebar-menu li.active {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--text-color);
+            border-right: 4px solid var(--secondary-color);
+        }
+
+        .submenu {
+            padding-right: 25px !important;
+            background: rgba(0,0,0,0.15);
+            font-size: 14px !important;
+        }
+
+        .mobile-header-bar {
+            display: none;
+            background-color: var(--card-bg);
+            padding: 12px 20px;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .mobile-menu-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .stat-box h4 {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-box p {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            white-space: nowrap;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+        }
+
+        table th {
+            background-color: rgba(255,255,255,0.05);
+            color: var(--accent-color);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin-top: 5px;
+            background: rgba(255,255,255,0.02);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .price-input-small {
+            width: 80px !important;
+            padding: 5px !important;
+            display: inline-block;
+        }
+
+        .search-criteria-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 900px) {
+            #app-container {
+                flex-direction: column;
+            }
+            .mobile-header-bar {
+                display: flex;
+            }
+            sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 0;
+                overflow: hidden;
+                position: relative;
+                transition: max-height 0.3s ease-out;
+            }
+            sidebar.open {
+                max-height: 450px;
+                overflow-y: auto;
+            }
+            main {
+                padding: 15px;
+                max-height: none;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- بوابة الدخول الذكية الموحدة -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2>تسجيل الدخول - الدار أونلاين</h2>
+            <div class="form-group">
+                <label>البريد الإلكتروني:</label>
+                <input type="email" id="login-email" placeholder="أدخل بريدك الإلكتروني...">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور:</label>
+                <input type="password" id="login-pass" placeholder="أدخل كلمة المرور...">
+            </div>
+            <button class="btn" onclick="handleUnifiedLogin()">دخول للنظام</button>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم العامة -->
+    <div id="app-container" style="display: none;">
+        
+        <sidebar id="main-sidebar">
+            <div class="sidebar-header" id="sidebar-title">منصة الدار أونلاين</div>
+            <ul class="sidebar-menu" id="dynamic-sidebar-menu"></ul>
+        </sidebar>
+
+        <div style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0;">
+            <div class="mobile-header-bar">
+                <span style="font-weight: bold; color: var(--accent-color);" id="mobile-header-title">الدار أونلاين</span>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰ القائمة الرئيسية</button>
+            </div>
+
+            <main>
+                <!-- 1. الرئيسية للإدارة -->
+                <section id="dashboard" class="section-content active">
+                    <div class="card">
+                        <h3>لوحة القيادة والتشغيل</h3>
+                        <p id="welcome-user-txt">مرحباً بك في منصة الدار أونلاين التعليمية.</p>
+                    </div>
+                </section>
+
+                <!-- 2. محرك البحث الذكي -->
+                <section id="search-slots" class="section-content">
+                    <div class="card">
+                        <h3>محرك البحث الذكي عن المعلمين</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                            <div class="form-group">
+                                <label>المادة المطلوبة:</label>
+                                <select id="search-subject-select"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>فئة الطالب المطلوبة:</label>
+                                <select id="search-category-select"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>الأيام والأوقات المطلوبة:</label>
+                            <div id="search-days-container"></div>
+                            <button type="button" class="btn" style="background: var(--warning-color); width: auto; padding: 6px 14px; font-size: 14px; margin-top: 5px;" onclick="addSearchDayRow()">+ إضافة يوم أو وقت آخر للبحث</button>
+                        </div>
+                        <button class="btn" style="margin-top: 15px;" onclick="executeSmartSearch()">بحث عن المعلمين المتاحين</button>
+                        <div id="search-results" style="margin-top: 20px;"></div>
+                    </div>
+                </section>
+
+                <!-- 3. إدارة المستخدمين وصلاحيات الإداريين -->
+                <section id="manage-users" class="section-content">
+                    <div class="card">
+                        <h3>إدارة المستخدمين وصلاحيات الإداريين</h3>
+                        <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="u-name" placeholder="اسم المستخدم..."></div>
+                        <div class="form-group"><label>البريد الإلكتروني:</label><input type="email" id="u-email" placeholder="user@aldar.com"></div>
+                        <div class="form-group"><label>كلمة المرور:</label><input type="password" id="u-pass" placeholder="كلمة المرور..."></div>
+                        <div class="form-group">
+                            <label>صفة المستخدم:</label>
+                            <select id="u-role" onchange="togglePermissionsBox()">
+                                <option value="admin">إداري (Admin)</option>
+                                <option value="teacher">معلم (Teacher)</option>
+                                <option value="student">طالب (Student)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="admin-permissions-box">
+                            <label>تحديد صلاحيات هذا الإداري:</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item"><input type="checkbox" name="perm" value="full" checked><label>صلاحيات كاملة (أدمن عام)</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="perm" value="teachers"><label>إدارة المعلمين</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="perm" value="students"><label>إدارة الطلاب</label></div>
+                                <div class="checkbox-item"><input type="checkbox" name="perm" value="finance"><label>الإدارة المالية والدخل</label></div>
+                            </div>
+                        </div>
+
+                        <button class="btn" onclick="saveUserRecord()">حفظ المستخدم وصلاحياته في القاعدة</button>
+
+                        <h4 style="margin-top: 25px; margin-bottom: 10px; color: var(--text-color);">قائمة مستخدمي النظام:</h4>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>الاسم</th>
+                                        <th>البريد</th>
+                                        <th>الصفة</th>
+                                        <th>الصلاحيات الإدارية</th>
+                                        <th>الإجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. إضافة وتعديل معلم -->
+                <section id="add-teacher" class="section-content">
+                    <div class="card">
+                        <h3 id="teacher-form-title">إضافة معلم جديد</h3>
+                        <input type="hidden" id="editing-teacher-id" value="">
+                        <div class="form-group"><label>الاسم الرباعي:</label><input type="text" id="t-name"></div>
+                        <div class="form-group"><label>البريد الإلكتروني:</label><input type="email" id="t-email"></div>
+                        <div class="form-group"><label>كلمة المرور:</label><input type="password" id="t-pass"></div>
+                        <div class="form-group"><label>الجوال:</label><input type="text" id="t-phone"></div>
+                        <div class="form-group">
+                            <label>المواد وأسعار الساعات (ج.م):</label>
+                            <div id="t-subjects-container" class="checkbox-group"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>فئات الطلاب التي يدرس لها المعلم:</label>
+                            <div id="t-categories-container" class="checkbox-group"></div>
+                        </div>
+                        <div class="form-group"><label>رابط زوم الثابت (اختياري):</label><input type="text" id="t-zoom" placeholder="https://zoom.us/j/..."></div>
+                        <button class="btn" id="teacher-save-btn" onclick="saveTeacher()">حفظ المعلم وتفريغ الحقول</button>
+                    </div>
+                </section>
+
+                <!-- 5. قاعدة المعلمين -->
+                <section id="teachers-db" class="section-content">
+                    <div class="card">
+                        <h3>قاعدة بيانات المعلمين</h3>
+                        <div class="table-responsive"><table><thead><tr><th>الاسم</th><th>البريد</th><th>الجوال</th><th>المواد والأسعار</th><th>الفئات المستهدفة</th><th>رابط زوم</th><th>إجراء</th></tr></thead><tbody id="teachers-table-body"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 6. إضافة وتعديل طالب -->
+                <section id="add-student" class="section-content">
+                    <div class="card">
+                        <h3 id="student-form-title">تسجيل طالب جديد</h3>
+                        <input type="hidden" id="editing-student-id" value="">
+                        <div class="form-group"><label>اسم الطالب:</label><input type="text" id="s-name"></div>
+                        <div class="form-group"><label>البريد الإلكتروني:</label><input type="email" id="s-email"></div>
+                        <div class="form-group"><label>كلمة المرور:</label><input type="password" id="s-pass"></div>
+                        <div class="form-group"><label>العمر:</label><input type="number" id="s-age"></div>
+                        <div class="form-group"><label>الجنس:</label><select id="s-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
+                        <div class="form-group"><label>الجوال:</label><input type="text" id="s-phone"></div>
+                        <div class="form-group"><label>فئة الطالب / التصنيف:</label><select id="s-category"></select></div>
+                        <div class="form-group"><label>المواد المشترك بها:</label><div id="s-subjects-container" class="checkbox-group"></div></div>
+                        <button class="btn" id="student-save-btn" onclick="saveStudent()">حفظ الطالب وتفريغ الحقول</button>
+                    </div>
+                </section>
+
+                <!-- 7. قاعدة الطلاب -->
+                <section id="students-db" class="section-content">
+                    <div class="card">
+                        <h3>قاعدة بيانات الطلاب (رصيد الحصص والمتابعة)</h3>
+                        <div class="table-responsive"><table><thead><tr><th>الاسم</th><th>البريد</th><th>العمر</th><th>الجنس</th><th>الفئة</th><th>المواد</th><th>الحصص المتبقية</th><th>إجراء</th></tr></thead><tbody id="students-table-body"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 8. إدارة المواد -->
+                <section id="manage-subjects" class="section-content">
+                    <div class="card">
+                        <h3>إدارة المواد الدراسية</h3>
+                        <div class="form-group"><label>اسم المادة الجديدة:</label><input type="text" id="new-subject-name" placeholder="مثال: التجويد"></div>
+                        <button class="btn" onclick="addSubject()">إضافة المادة</button>
+                        <h4 style="margin-top: 25px; margin-bottom: 10px; color: var(--text-color);">قائمة المواد المتاحة:</h4>
+                        <div class="table-responsive"><table><thead><tr><th>اسم المادة</th><th>الإجراء</th></tr></thead><tbody id="subjects-table-body"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 9. إدارة فئات الطلاب -->
+                <section id="manage-categories" class="section-content">
+                    <div class="card">
+                        <h3>إدارة فئات وتصنيفات الطلاب</h3>
+                        <div class="form-group"><label>اسم الفئة الجديدة:</label><input type="text" id="new-category-name" placeholder="مثال: مصريين، بنات.."></div>
+                        <button class="btn" onclick="addCategory()">إضافة الفئة</button>
+                        <h4 style="margin-top: 25px; margin-bottom: 10px; color: var(--text-color);">قائمة الفئات المتاحة:</h4>
+                        <div class="table-responsive"><table><thead><tr><th>اسم الفئة</th><th>الإجراء</th></tr></thead><tbody id="categories-table-body"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 10. رواتب المعلمين -->
+                <section id="fin-salaries" class="section-content">
+                    <div class="card">
+                        <h3>رواتب المعلمين والمستحقات الشهرية</h3>
+                        <div class="table-responsive"><table><thead><tr><th>اسم المعلم</th><th>المواد وأسعار الساعات</th><th>إجمالي المستحق المتوقع شهرياً</th></tr></thead><tbody id="salaries-table-body"></tbody></table></div>
+                    </div>
+                </section>
+
+                <!-- 11. تسجيل الدخل والاشتراكات -->
+                <section id="fin-income" class="section-content">
+                    <div class="card">
+                        <h3>تسجيل الدخل والاشتراكات المدفوعة</h3>
+                        <div class="form-group">
+                            <label>🔍 ابحث بالاسم لتصفية الطلاب:</label>
+                            <input type="text" id="student-search-filter" placeholder="اكتب جزءاً من اسم الطالب..." oninput="filterStudentSelect()">
+                        </div>
+                        <div class="form-group"><label>اختر الطالب:</label><select id="pay-student-select"></select></div>
+                        <div class="form-group"><label>المبلغ المدفوع (بالجنيه المصري ج.م):</label><input type="number" id="pay-amount" placeholder="500"></div>
+                        <div class="form-group">
+                            <label>قناة الدفع:</label>
+                            <select id="pay-channel">
+                                <option value="البنك الأهلي المصري">البنك الأهلي المصري</option>
+                                <option value="قطر الوطني الأهلي QNB">قطر الوطني الأهلي QNB</option>
+                                <option value="فودافون كاش">فودافون كاش</option>
+                                <option value="إنستا باي">إنستا باي</option>
+                                <option value="باي بال">باي بال</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="recordPayment()">تأكيد الدفع وإضافة الحصص تلقائياً</button>
+                    </div>
+                </section>
+
+                <!-- 12. قنوات الدفع والتقارير -->
+                <section id="fin-channels" class="section-content">
+                    <div class="card">
+                        <h3>قنوات الدفع والتقارير المالية وصافي الأرباح</h3>
+                        <div class="stats-grid">
+                            <div class="stat-box"><h4>إجمالي الدخل العام</h4><p id="total-income-val">0 ج.م</p></div>
+                            <div class="stat-box"><h4>إجمالي الرواتب المستحقة</h4><p id="total-salaries-val">0 ج.م</p></div>
+                            <div class="stat-box"><h4>صافي الربح</h4><p id="net-profit-val">0 ج.م</p></div>
+                        </div>
+                        <h4>تفصيلي الدخل حسب قناة الدفع:</h4>
+                        <div id="channel-breakdown" style="margin-top: 10px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 6px;"></div>
+                    </div>
+                </section>
+
+                <!-- 13. لوحة تحكم المعلم التشغيلية المتقدمة -->
+                <section id="teacher-portal" class="section-content">
+                    <div class="card">
+                        <h3>لوحة المعلم التشغيلية - متابعة الحصص، التقويم، ورابط زوم</h3>
+                        <div id="teacher-portal-info"></div>
+                    </div>
+                </section>
+
+                <!-- 14. لوحة تحكم الطالب -->
+                <section id="student-portal" class="section-content">
+                    <div class="card">
+                        <h3>لوحة الطالب الشخصية (متابعة الحصص والرصيد)</h3>
+                        <div id="student-portal-info"></div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        let subjects = JSON.parse(localStorage.getItem('aldar_subjects')) || ['القرآن الكريم', 'اللغة العربية', 'الرياضيات', 'نور البيان'];
+        let categories = JSON.parse(localStorage.getItem('aldar_categories')) || ['مصريين', 'عرب أو أجانب', 'أقل من 10 سنوات', 'أكثر من 10 سنوات', 'رجال', 'نساء', 'أولاد', 'بنات'];
+        let teachers = JSON.parse(localStorage.getItem('aldar_teachers')) || [];
+        let students = JSON.parse(localStorage.getItem('aldar_students')) || [];
+        let payments = JSON.parse(localStorage.getItem('aldar_payments')) || [];
+        let teacherSchedules = JSON.parse(localStorage.getItem('aldar_teacher_schedules')) || []; // المواعيد المتاحة التي يحددها المعلم
+        let lessonsLog = JSON.parse(localStorage.getItem('aldar_lessons_log')) || []; // سجل الحصص والتقييمات
+        
+        let systemUsers = JSON.parse(localStorage.getItem('aldar_system_users')) || [
+            { id: 1, name: 'مدير النظام العام', email: 'admin@aldar.com', password: '1234', role: 'admin', permissions: ['full'] }
+        ];
+
+        window.onload = function() {
+            let loggedInEmail = sessionStorage.getItem('aldar_logged_email');
+            if (loggedInEmail) {
+                let user = systemUsers.find(u => u.email.toLowerCase() === loggedInEmail.toLowerCase());
+                if(user) {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'flex';
+                    setupUserPortal(user);
+                }
+            }
+        };
+
+        function togglePermissionsBox() {
+            let role = document.getElementById('u-role').value;
+            let box = document.getElementById('admin-permissions-box');
+            box.style.display = (role === 'admin') ? 'block' : 'none';
+        }
+
+        function saveUserRecord() {
+            let name = document.getElementById('u-name').value.trim();
+            let email = document.getElementById('u-email').value.trim().toLowerCase();
+            let pass = document.getElementById('u-pass').value.trim();
+            let role = document.getElementById('u-role').value;
+            
+            let perms = [];
+            if(role === 'admin') {
+                document.querySelectorAll('input[name="perm"]:checked').forEach(cb => perms.push(cb.value));
+            }
+
+            if(!name || !email || !pass) { alert('يرجى ملء جميع بيانات المستخدم الأساسية'); return; }
+            if(systemUsers.some(u => u.email === email)) { alert('هذا البريد الإلكتروني مسجل مسبقاً لمستخدم آخر!'); return; }
+
+            systemUsers.push({ id: Date.now(), name, email, password: pass, role, permissions: perms });
+            localStorage.setItem('aldar_system_users', JSON.stringify(systemUsers));
+
+            if(role === 'teacher' && !teachers.some(t => t.email.toLowerCase() === email)) {
+                teachers.push({ id: Date.now(), name, email, password: pass, phone: '', subjects: [{name: subjects[0], price: 100}], categories: [categories[0]], zoomLink: '' });
+                localStorage.setItem('aldar_teachers', JSON.stringify(teachers));
+            } else if(role === 'student' && !students.some(s => s.email.toLowerCase() === email)) {
+                students.push({ id: Date.now(), name, email, password: pass, age: 10, gender: 'male', phone: '', category: categories[0], subjects: [subjects[0]], remainingLessons: 0 });
+                localStorage.setItem('aldar_students', JSON.stringify(students));
+            }
+
+            document.getElementById('u-name').value = '';
+            document.getElementById('u-email').value = '';
+            document.getElementById('u-pass').value = '';
+            renderUsersTable();
+            alert('تم تسجيل المستخدم وتحديد صلاحياته بنجاح في قاعدة البيانات!');
+        }
+
+        function renderUsersTable() {
+            let tbody = document.getElementById('users-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = systemUsers.map((u, idx) => `
+                <tr>
+                    <td>${u.name}</td>
+                    <td>${u.email}</td>
+                    <td><strong style="color:var(--secondary-color);">${u.role === 'admin' ? 'إداري' : (u.role === 'teacher' ? 'معلم' : 'طالب')}</strong></td>
+                    <td>${u.role === 'admin' ? (u.permissions.includes('full') ? 'صلاحيات كاملة' : u.permissions.join('، ')) : 'خاص بدوره'}</td>
+                    <td>${u.email !== 'admin@aldar.com' ? `<button class="btn" style="padding:4px 8px; background:var(--danger-color); width:auto;" onclick="deleteUser(${idx})">حذف</button>` : 'محمي'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteUser(index) {
+            if(confirm('هل أنت متأكد من حذف هذا المستخدم من النظام؟')) {
+                systemUsers.splice(index, 1);
+                localStorage.setItem('aldar_system_users', JSON.stringify(systemUsers));
+                renderUsersTable();
+            }
+        }
+
+        function handleUnifiedLogin() {
+            let email = document.getElementById('login-email').value.trim().toLowerCase();
+            let pass = document.getElementById('login-pass').value.trim();
+            if (!email || !pass) { alert('يرجى إدخال البريد الإلكتروني وكلمة المرور'); return; }
+
+            let foundUser = systemUsers.find(u => u.email.toLowerCase() === email && u.password === pass);
+            if(foundUser) {
+                sessionStorage.setItem('aldar_logged_email', foundUser.email);
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                setupUserPortal(foundUser);
+            } else {
+                alert('البريد الإلكتروني أو كلمة المرور غير صحيحة!');
+            }
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            location.reload();
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('main-sidebar').classList.toggle('open');
+        }
+
+        function setupUserPortal(user) {
+            const menu = document.getElementById('dynamic-sidebar-menu');
+            menu.innerHTML = '';
+
+            if(user.role === 'admin') {
+                document.getElementById('sidebar-title').innerText = 'لوحة تحكم الإدارة';
+                let hasFull = user.permissions.includes('full');
+                let menuHtml = `<li onclick="switchSection('dashboard', this)" class="active">📊 الرئيسية واللوحة</li>`;
+                
+                if(hasFull || user.permissions.includes('teachers')) {
+                    menuHtml += `<li onclick="switchSection('search-slots', this)">🔍 محرك البحث الذكي</li>`;
+                    menuHtml += `<li onclick="switchSection('add-teacher', this)" id="menu-add-teacher">➕ إضافة معلم جديد</li>`;
+                    menuHtml += `<li onclick="switchSection('teachers-db', this)">👩‍🏫 قاعدة المعلمين</li>`;
+                }
+                
+                if(hasFull || user.permissions.includes('students')) {
+                    menuHtml += `<li onclick="switchSection('add-student', this)" id="menu-add-student">➕ إضافة طالب جديد</li>`;
+                    menuHtml += `<li onclick="switchSection('students-db', this)">🎓 قاعدة الطلاب</li>`;
+                }
+
+                if(hasFull) {
+                    menuHtml += `<li onclick="switchSection('manage-users', this)">👥 إدارة المستخدمين والصلاحيات</li>`;
+                    menuHtml += `<li onclick="switchSection('manage-subjects', this)">📚 إدارة المواد</li>`;
+                    menuHtml += `<li onclick="switchSection('manage-categories', this)">🏷️ إدارة فئات الطلاب</li>`;
+                }
+
+                if(hasFull || user.permissions.includes('finance')) {
+                    menuHtml += `
+                        <li style="background: rgba(255,255,255,0.06); font-weight: bold; color: var(--warning-color); border-top: 1px solid rgba(255,255,255,0.1);">💰 الإدارة المالية</li>
+                        <li class="submenu" onclick="switchSection('fin-salaries', this)">💸 رواتب المعلمين والمستحقات</li>
+                        <li class="submenu" onclick="switchSection('fin-income', this)">📥 تسجيل الدخل والاشتراكات</li>
+                        <li class="submenu" onclick="switchSection('fin-channels', this)">💳 قنوات الدفع والتقارير</li>
+                    `;
+                }
+
+                menuHtml += `<li onclick="logout()" style="color: var(--danger-color); margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">🚪 تسجيل الخروج</li>`;
+                menu.innerHTML = menuHtml;
+                document.getElementById('welcome-user-txt').innerText = `مرحباً بك يا إداري النظام: ${user.name}`;
+                initAppData();
+                switchSection('dashboard', document.querySelector('.sidebar-menu li'));
+
+            } else if(user.role === 'teacher') {
+                document.getElementById('sidebar-title').innerText = 'بوابة المعلم التشغيلية';
+                menu.innerHTML = `
+                    <li onclick="switchSection('teacher-portal', this)" class="active">👨‍🏫 لوحة المعلم والمواعيد والحصص</li>
+                    <li onclick="logout()" style="color: var(--danger-color); margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">🚪 تسجيل الخروج</li>
+                `;
+                loadTeacherPortal(user.email);
+                switchSection('teacher-portal', document.querySelector('.sidebar-menu li'));
+
+            } else if(user.role === 'student') {
+                document.getElementById('sidebar-title').innerText = 'بوابة الطالب';
+                menu.innerHTML = `
+                    <li onclick="switchSection('student-portal', this)" class="active">🎓 رصيدي ومتابعة حصصي</li>
+                    <li onclick="logout()" style="color: var(--danger-color); margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">🚪 تسجيل الخروج</li>
+                `;
+                loadStudentPortal(user.email);
+                switchSection('student-portal', document.querySelector('.sidebar-menu li'));
+            }
+        }
+
+        // لوحة المعلم التشغيلية المتقدمة والمطلوبة بالكامل
+        function loadTeacherPortal(email) {
+            let t = teachers.find(item => item.email.toLowerCase() === email.toLowerCase());
+            let infoDiv = document.getElementById('teacher-portal-info');
+            if(!t) {
+                infoDiv.innerHTML = '<p style="color:var(--danger-color);">عذراً، لم يتم العثور على ملف المعلم المرتبط بهذا البريد.</p>';
+                return;
+            }
+
+            // تصفية المواعيد المتاحة الخاصة بهذا المعلم
+            let mySchedules = teacherSchedules.filter(s => s.teacherEmail.toLowerCase() === email.toLowerCase());
+            // تصفية الحصص والطلاب المسندين لهذا المعلم
+            let myLogs = lessonsLog.filter(l => l.teacherEmail.toLowerCase() === email.toLowerCase());
+            let currentMonthEarnings = myLogs.reduce((sum, l) => sum + (parseFloat(l.price) || 100), 0);
+
+            let zoomUrl = t.zoomLink ? t.zoomLink : 'https://zoom.us/';
+
+            infoDiv.innerHTML = `
+                <div style="background: rgba(59,130,246,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--secondary-color);">
+                    <h4 style="color:var(--secondary-color); margin-bottom: 8px;">مرحباً أستاذ/ة: ${t.name}</h4>
+                    <p><strong>جوال:</strong> ${t.phone || 'غير محدد'} | <strong>المواد:</strong> ${t.subjects.map(s => s.name + ' (' + s.price + ' ج.م)').join(', ')}</p>
+                    <div style="margin-top: 10px;">
+                        <a href="${zoomUrl}" target="_blank" class="btn" style="display:inline-block; text-align:center; background:var(--accent-color); text-decoration:none; width:auto; padding: 10px 20px;">🎥 الدخول لرابط زوم المباشر للحصة</a>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box"><h4>إجمالي الحصص المعطاة هذا الشهر</h4><p>${myLogs.length} حصة</p></div>
+                    <div class="stat-box"><h4>المستحقات المالية لهذا الشهر</h4><p>${currentMonthEarnings} ج.م</p></div>
+                </div>
+
+                <!-- 1. تحديد المواعيد المتاحة للمعلم (ليراها موظفو التنسيق) -->
+                <div class="card" style="background: rgba(0,0,0,0.2);">
+                    <h4 style="color:var(--warning-color); margin-bottom: 10px;">📅 تحديد مواعيدي المتاحة (لتنسيق الطلاب)</h4>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                        <select id="new-sched-day">
+                            <option value="السبت">السبت</option><option value="الأحد">الأحد</option><option value="الإثنين">الإثنين</option>
+                            <option value="الثلاثاء">الثلاثاء</option><option value="الأربعاء">الأربعاء</option><option value="الخميس">الخميس</option><option value="الجمعة">الجمعة</option>
+                        </select>
+                        <input type="text" id="new-sched-time" placeholder="مثال: 8:00 مساءً">
+                    </div>
+                    <button class="btn" style="width:auto; padding:8px 15px; background:var(--warning-color);" onclick="addTeacherAvailability('${t.email}')">+ إضافة موعد متاح جديد</button>
+                    
+                    <div style="margin-top: 15px;">
+                        <strong>مواعيدي المتاحة حالياً في النظام:</strong>
+                        <ul style="margin-top: 5px; padding-right: 20px;">
+                            ${mySchedules.length > 0 ? mySchedules.map((s, idx) => `<li>${s.day} - ${s.time} <button style="color:var(--danger-color); background:none; border:none; cursor:pointer; margin-right:10px;" onclick="removeTeacherAvailability(${idx})">[حذف]</button></li>`).join('') : '<p style="color:var(--text-muted); font-size:13px;">لم تضف مواعيد بعد.</p>'}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 2. تقويم الحصص والجدول اليومي وإسناد الطلاب -->
+                <div class="card" style="background: rgba(0,0,0,0.2);">
+                    <h4 style="color:var(--accent-color); margin-bottom: 10px;">👥 جدول الحصص والطلاب المسندين إلي</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>اسم الطالب</th>
+                                    <th>المادة</th>
+                                    <th>الموعد المحدد</th>
+                                    <th>إجراء الحصة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${students.length > 0 ? students.map(st => `
+                                    <tr>
+                                        <td><strong>${st.name}</strong> (${st.category || 'عام'})</td>
+                                        <td>${st.subjects.join(', ')}</td>
+                                        <td>حسب جدول التنسيق</td>
+                                        <td>
+                                            <button class="btn" style="padding:6px 12px; background:var(--accent-color); width:auto; font-size:13px;" onclick="openLogLessonModal('${t.email}', '${st.name}', '${st.subjects[0]}', '${t.subjects[0] ? t.subjects[0].price : 100}')">📝 تسجيل حصة وتقييم</button>
+                                        </td>
+                                    </tr>
+                                `).join('') : '<tr><td colspan="4" style="text-align:center;">لا توجد طلاب مسجلين بالنظام حالياً.</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. سجل الحصص المعطاة وما تم أخذه والتقييمات -->
+                <div class="card" style="background: rgba(0,0,0,0.2);">
+                    <h4 style="color:var(--text-color); margin-bottom: 10px;">📋 سجل الحصص السابقة وما تم إنجازه وتقييم الطلاب</h4>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>اسم الطالب</th>
+                                    <th>المادة</th>
+                                    <th>ما تم أخذه وشرحه</th>
+                                    <th>تقييم الحصة</th>
+                                    <th>تقييم المراجعة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${myLogs.length > 0 ? myLogs.map(l => `
+                                    <tr>
+                                        <td>${l.date}</td>
+                                        <td>${l.studentName}</td>
+                                        <td>${l.subject}</td>
+                                        <td>${l.lessonDetails}</td>
+                                        <td><span style="color:var(--warning-color); font-weight:bold;">${l.lessonEval}</span></td>
+                                        <td><span style="color:var(--accent-color); font-weight:bold;">${l.revEval}</span></td>
+                                    </tr>
+                                `).join('') : '<tr><td colspan="6" style="text-align:center;">لم يتم تسجيل حصص معطاة حتى الآن.</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addTeacherAvailability(email) {
+            let day = document.getElementById('new-sched-day').value;
+            let time = document.getElementById('new-sched-time').value.trim();
+            if(!time) { alert('يرجى تحديد الوقت بدقة'); return; }
+            teacherSchedules.push({ teacherEmail: email, day, time });
+            localStorage.setItem('aldar_teacher_schedules', JSON.stringify(teacherSchedules));
+            loadTeacherPortal(email);
+        }
+
+        function removeTeacherAvailability(index) {
+            teacherSchedules.splice(index, 1);
+            localStorage.setItem('aldar_teacher_schedules', JSON.stringify(teacherSchedules));
+            let loggedInEmail = sessionStorage.getItem('aldar_logged_email');
+            loadTeacherPortal(loggedInEmail);
+        }
+
+        function openLogLessonModal(teacherEmail, studentName, subject, price) {
+            let details = prompt(`تسجيل ما تم أخذه في حصة الطالب: ${studentName}\nاكتب عنوان الدرس أو ما تم شرحه:`);
+            if(!details) return;
+            let lessonEval = prompt('تقييم الطالب في الحصة (مثال: ممتاز، جيد جداً، 9/10):', 'ممتاز');
+            let revEval = prompt('تقييم المراجعة والتسميع (مثال: حفظ متقن، يحتاج مراجعة):', 'متقن');
+
+            lessonsLog.push({
+                teacherEmail,
+                studentName,
+                subject,
+                price: parseFloat(price) || 100,
+                lessonDetails: details,
+                lessonEval: lessonEval || 'ممتاز',
+                revEval: revEval || 'متقن',
+                date: new Date().toLocaleDateString('ar-EG')
+            });
+
+            localStorage.setItem('aldar_lessons_log', JSON.stringify(lessonsLog));
+            alert('تم تسجيل تفاصيل الحصة وتقييم الطالب بنجاح وإضافتها لسجل المعلم ولحساب المستحقات المالية!');
+            loadTeacherPortal(teacherEmail);
+        }
+
+        function loadStudentPortal(email) {
+            let s = students.find(item => item.email.toLowerCase() === email.toLowerCase());
+            let infoDiv = document.getElementById('student-portal-info');
+            if(!s) {
+                infoDiv.innerHTML = '<p style="color:var(--danger-color);">عذراً، لم يتم العثور على ملف الطالب المرتبط بهذا البريد.</p>';
+                return;
+            }
+            infoDiv.innerHTML = `
+                <p><strong>مرحباً بك:</strong> ${s.name}</p><br>
+                <p><strong>الفئة / التصنيف:</strong> ${s.category || 'غير محدد'}</p><br>
+                <p><strong>المواد المشترك بها:</strong> ${s.subjects.join(', ')}</p><br>
+                <p><strong>رصيد الحصص المتبقي في حسابك:</strong> <span style="color:var(--accent-color); font-size:22px;">${s.remainingLessons || 0} حصة</span></p>
+            `;
+        }
+
+        function switchSection(sectionId, element) {
+            document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+            let targetSec = document.getElementById(sectionId);
+            if(targetSec) targetSec.classList.add('active');
+            if(element) element.classList.add('active');
+            if(window.innerWidth <= 900) {
+                document.getElementById('main-sidebar').classList.remove('open');
+            }
+            if(sectionId === 'search-slots' && document.getElementById('search-days-container').innerHTML === '') {
+                resetSearchRows();
+            }
+            if(sectionId === 'manage-users') renderUsersTable();
+        }
+
+        function initAppData() {
+            renderSubjectsUI();
+            renderCategoriesUI();
+            renderTeachersTable();
+            renderStudentsTable();
+            renderFinancials();
+            renderUsersTable();
+            populateStudentSelect(students);
+        }
+
+        function renderSubjectsUI() {
+            const tContainer = document.getElementById('t-subjects-container');
+            if(tContainer) {
+                tContainer.innerHTML = '';
+                subjects.forEach(sub => {
+                    tContainer.innerHTML += `<div class="checkbox-item"><input type="checkbox" name="t_sub" value="${sub}"><label>${sub}</label><input type="number" placeholder="السعر" class="price-input-small" id="price_${sub}" value="100"> ج.م</div>`;
+                });
+            }
+
+            const sContainer = document.getElementById('s-subjects-container');
+            if(sContainer) {
+                sContainer.innerHTML = '';
+                subjects.forEach(sub => {
+                    sContainer.innerHTML += `<div class="checkbox-item"><input type="checkbox" name="s_sub" value="${sub}"><label>${sub}</label></div>`;
+                });
+            }
+
+            let searchSub = document.getElementById('search-subject-select');
+            if(searchSub) searchSub.innerHTML = subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+            
+            let subTbl = document.getElementById('subjects-table-body');
+            if(subTbl) {
+                subTbl.innerHTML = subjects.map((sub, idx) => `
+                    <tr>
+                        <td><strong>${sub}</strong></td>
+                        <td><button class="btn" style="padding:4px 10px; background:var(--danger-color); width:auto;" onclick="deleteSubject(${idx})">حذف</button></td>
+                    </tr>
+                `).join('') || '<tr><td colspan="2" style="text-align:center;">لا توجد مواد مسجلة</td></tr>';
+            }
+        }
+
+        function renderCategoriesUI() {
+            const tCatContainer = document.getElementById('t-categories-container');
+            if(tCatContainer) {
+                tCatContainer.innerHTML = '';
+                categories.forEach(cat => {
+                    tCatContainer.innerHTML += `<div class="checkbox-item"><input type="checkbox" name="t_cat" value="${cat}"><label>${cat}</label></div>`;
+                });
+            }
+
+            let catSelect = document.getElementById('s-category');
+            if(catSelect) catSelect.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('') || '<option value="">لا توجد فئات</option>';
+
+            let searchCat = document.getElementById('search-category-select');
+            if(searchCat) searchCat.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+            let catTbl = document.getElementById('categories-table-body');
+            if(catTbl) {
+                catTbl.innerHTML = categories.map((cat, idx) => `
+                    <tr>
+                        <td><strong>${cat}</strong></td>
+                        <td><button class="btn" style="padding:4px 10px; background:var(--danger-color); width:auto;" onclick="deleteCategory(${idx})">حذف</button></td>
+                    </tr>
+                `).join('') || '<tr><td colspan="2" style="text-align:center;">لا توجد فئات مسجلة</td></tr>';
+            }
+        }
+
+        const availableDaysList = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+
+        function resetSearchRows() {
+            const container = document.getElementById('search-days-container');
+            if(!container) return;
+            container.innerHTML = '';
+            addSearchDayRow();
+        }
+
+        function addSearchDayRow() {
+            const container = document.getElementById('search-days-container');
+            if(!container) return;
+            const rowId = 'search_row_' + Date.now();
+            let dayOptions = availableDaysList.map(d => `<option value="${d}">${d}</option>`).join('');
+
+            let html = `
+                <div class="search-criteria-row" id="${rowId}">
+                    <div style="flex: 1;">
+                        <label style="font-size:12px; color:var(--text-muted);">اليوم:</label>
+                        <select class="search-day-select">${dayOptions}</select>
+                    </div>
+                    <div style="flex: 2;">
+                        <label style="font-size:12px; color:var(--text-muted);">الساعات المطلوبة:</label>
+                        <input type="text" class="search-time-input" placeholder="مثال: 8 مساءً">
+                    </div>
+                    <div>
+                        <button type="button" class="btn" style="background: var(--danger-color); padding: 8px 12px; margin-top: 18px;" onclick="document.getElementById('${rowId}').remove()">حذف</button>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function addSubject() {
+            const name = document.getElementById('new-subject-name').value.trim();
+            if(!name) { alert('يرجى كتابة اسم المادة'); return; }
+            if(subjects.includes(name)) { alert('هذه المادة موجودة مسبقاً!'); return; }
+            subjects.push(name);
+            localStorage.setItem('aldar_subjects', JSON.stringify(subjects));
+            document.getElementById('new-subject-name').value = '';
+            initAppData();
+            alert('تمت إضافة المادة بنجاح!');
+        }
+
+        function deleteSubject(index) {
+            if(confirm(`هل أنت متأكد من حذف مادة "${subjects[index]}"؟`)) {
+                subjects.splice(index, 1);
+                localStorage.setItem('aldar_subjects', JSON.stringify(subjects));
+                initAppData();
+                alert('تم حذف المادة بنجاح!');
+            }
+        }
+
+        function addCategory() {
+            const name = document.getElementById('new-category-name').value.trim();
+            if(!name) { alert('يرجى كتابة اسم الفئة'); return; }
+            if(categories.includes(name)) { alert('هذه الفئة موجودة مسبقاً!'); return; }
+            categories.push(name);
+            localStorage.setItem('aldar_categories', JSON.stringify(categories));
+            document.getElementById('new-category-name').value = '';
+            initAppData();
+            alert('تمت إضافة الفئة بنجاح!');
+        }
+
+        function deleteCategory(index) {
+            if(confirm(`هل أنت متأكد من حذف فئة "${categories[index]}"؟`)) {
+                categories.splice(index, 1);
+                localStorage.setItem('aldar_categories', JSON.stringify(categories));
+                initAppData();
+                alert('تم حذف الفئة بنجاح!');
+            }
+        }
+
+        function populateStudentSelect(listToRender) {
+            const paySelect = document.getElementById('pay-student-select');
+            if(paySelect) {
+                paySelect.innerHTML = listToRender.map(st => `<option value="${st.id}">${st.name} (رصيد الحصص: ${st.remainingLessons || 0})</option>`).join('') || '<option value="">لا توجد نتائج مطابقة</option>';
+            }
+        }
+
+        function filterStudentSelect() {
+            const query = document.getElementById('student-search-filter').value.trim().toLowerCase();
+            if(!query) { populateStudentSelect(students); return; }
+            populateStudentSelect(students.filter(st => st.name.toLowerCase().includes(query)));
+        }
+
+        function saveTeacher() {
+            const editId = document.getElementById('editing-teacher-id').value;
+            const name = document.getElementById('t-name').value;
+            const email = document.getElementById('t-email').value;
+            const password = document.getElementById('t-pass').value;
+            const phone = document.getElementById('t-phone').value;
+            const zoomLink = document.getElementById('t-zoom').value;
+            
+            const selectedSubs = [];
+            document.querySelectorAll('input[name="t_sub"]:checked').forEach(cb => {
+                selectedSubs.push({ name: cb.value, price: document.getElementById(`price_${cb.value}`).value || 100 });
+            });
+
+            const selectedCats = [];
+            document.querySelectorAll('input[name="t_cat"]:checked').forEach(cb => selectedCats.push(cb.value));
+
+            if(!name || !email || !password || selectedSubs.length === 0) { alert('يرجى إكمال بيانات المعلم الأساسية والمادة وسعرها'); return; }
+
+            if(editId) {
+                let teacher = teachers.find(t => t.id == editId);
+                if(teacher) {
+                    teacher.name = name; teacher.email = email; teacher.password = password; teacher.phone = phone; teacher.subjects = selectedSubs; teacher.categories = selectedCats; teacher.zoomLink = zoomLink;
+                }
+                alert('تم تحديث بيانات المعلم بنجاح!');
+            } else {
+                teachers.push({ id: Date.now(), name, email, password, phone, subjects: selectedSubs, categories: selectedCats, zoomLink });
+                if(!systemUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+                    systemUsers.push({ id: Date.now(), name, email, password, role: 'teacher', permissions: [] });
+                    localStorage.setItem('aldar_system_users', JSON.stringify(systemUsers));
+                }
+                alert('تم حفظ المعلم بنجاح!');
+            }
+
+            localStorage.setItem('aldar_teachers', JSON.stringify(teachers));
+            resetTeacherForm();
+            renderTeachersTable();
+        }
+
+        function resetTeacherForm() {
+            document.getElementById('editing-teacher-id').value = '';
+            document.getElementById('teacher-form-title').innerText = 'إضافة معلم جديد';
+            document.getElementById('teacher-save-btn').innerText = 'حفظ المعلم وتفريغ الحقول';
+            document.getElementById('t-name').value = ''; document.getElementById('t-email').value = ''; document.getElementById('t-pass').value = ''; document.getElementById('t-phone').value = ''; document.getElementById('t-zoom').value = '';
+            document.querySelectorAll('input[name="t_sub"]').forEach(cb => cb.checked = false);
+            document.querySelectorAll('input[name="t_cat"]').forEach(cb => cb.checked = false);
+        }
+
+        function editTeacher(id) {
+            let t = teachers.find(item => item.id == id);
+            if(!t) return;
+            document.getElementById('editing-teacher-id').value = t.id;
+            document.getElementById('teacher-form-title').innerText = 'تعديل بيانات المعلم: ' + t.name;
+            document.getElementById('teacher-save-btn').innerText = 'تحديث بيانات المعلم';
+            document.getElementById('t-name').value = t.name;
+            document.getElementById('t-email').value = t.email;
+            document.getElementById('t-pass').value = t.password;
+            document.getElementById('t-phone').value = t.phone;
+            document.getElementById('t-zoom').value = t.zoomLink || '';
+
+            document.querySelectorAll('input[name="t_sub"]').forEach(cb => {
+                let foundSub = t.subjects.find(s => s.name === cb.value);
+                if(foundSub) {
+                    cb.checked = true;
+                    document.getElementById(`price_${cb.value}`).value = foundSub.price;
+                } else { cb.checked = false; }
+            });
+
+            document.querySelectorAll('input[name="t_cat"]').forEach(cb => {
+                cb.checked = (t.categories && t.categories.includes(cb.value));
+            });
+
+            switchSection('add-teacher', document.getElementById('menu-add-teacher'));
+        }
+
+        function renderTeachersTable() {
+            let tbody = document.getElementById('teachers-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = teachers.map((t, idx) => `
+                <tr>
+                    <td>${t.name}</td>
+                    <td>${t.email}</td>
+                    <td>${t.phone}</td>
+                    <td>${t.subjects.map(s=>s.name+' ('+s.price+' ج.م)').join(', ')}</td>
+                    <td>${t.categories ? t.categories.join('، ') : 'غير محدد'}</td>
+                    <td>${t.zoomLink ? '<a href="'+t.zoomLink+'" target="_blank">رابط زوم</a>' : 'غير متوفر'}</td>
+                    <td>
+                        <button class="btn" style="padding:4px 8px; background:var(--warning-color); width:auto; margin-left:5px;" onclick="editTeacher(${t.id})">تعديل</button>
+                        <button class="btn" style="padding:4px 8px; background:var(--danger-color); width:auto;" onclick="teachers.splice(${idx},1);localStorage.setItem('aldar_teachers',JSON.stringify(teachers));renderTeachersTable();">حذف</button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="7" style="text-align:center;">لا توجد بيانات معلمين مسجلة</td></tr>';
+        }
+
+        function saveStudent() {
+            const editId = document.getElementById('editing-student-id').value;
+            const name = document.getElementById('s-name').value;
+            const email = document.getElementById('s-email').value;
+            const password = document.getElementById('s-pass').value;
+            const age = document.getElementById('s-age').value;
+            const gender = document.getElementById('s-gender').value;
+            const phone = document.getElementById('s-phone').value;
+            const category = document.getElementById('s-category').value;
+            const selectedSubs = [];
+            document.querySelectorAll('input[name="s_sub"]:checked').forEach(cb => selectedSubs.push(cb.value));
+
+            if(!name || !email || !password || selectedSubs.length === 0) { alert('يرجى إكمال بيانات الطالب الأساسية ومادة واحدة على الأقل'); return; }
+
+            if(editId) {
+                let student = students.find(s => s.id == editId);
+                if(student) {
+                    student.name = name; student.email = email; student.password = password; student.age = age; student.gender = gender; student.phone = phone; student.category = category; student.subjects = selectedSubs;
+                }
+                alert('تم تحديث بيانات الطالب بنجاح!');
+            } else {
+                students.push({ id: Date.now(), name, email, password, age, gender, phone, category, subjects: selectedSubs, remainingLessons: 0 });
+                if(!systemUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+                    systemUsers.push({ id: Date.now(), name, email, password, role: 'student', permissions: [] });
+                    localStorage.setItem('aldar_system_users', JSON.stringify(systemUsers));
+                }
+                alert('تم حفظ الطالب بنجاح!');
+            }
+
+            localStorage.setItem('aldar_students', JSON.stringify(students));
+            resetStudentForm();
+            renderStudentsTable();
+            populateStudentSelect(students);
+        }
+
+        function resetStudentForm() {
+            document.getElementById('editing-student-id').value = '';
+            document.getElementById('student-form-title').innerText = 'تسجيل طالب جديد';
+            document.getElementById('student-save-btn').innerText = 'حفظ الطالب وتفريغ الحقول';
+            document.getElementById('s-name').value = ''; document.getElementById('s-email').value = ''; document.getElementById('s-pass').value = ''; document.getElementById('s-age').value = ''; document.getElementById('s-phone').value = '';
+            document.querySelectorAll('input[name="s_sub"]').forEach(cb => cb.checked = false);
+        }
+
+        function editStudent(id) {
+            let s = students.find(item => item.id == id);
+            if(!s) return;
+            document.getElementById('editing-student-id').value = s.id;
+            document.getElementById('student-form-title').innerText = 'تعديل بيانات الطالب: ' + s.name;
+            document.getElementById('student-save-btn').innerText = 'تحديث بيانات الطالب';
+            document.getElementById('s-name').value = s.name;
+            document.getElementById('s-email').value = s.email;
+            document.getElementById('s-pass').value = s.password;
+            document.getElementById('s-age').value = s.age;
+            document.getElementById('s-gender').value = s.gender;
+            document.getElementById('s-phone').value = s.phone;
+            document.getElementById('s-category').value = s.category || '';
+
+            document.querySelectorAll('input[name="s_sub"]').forEach(cb => {
+                cb.checked = s.subjects.includes(cb.value);
+            });
+
+            switchSection('add-student', document.getElementById('menu-add-student'));
+        }
+
+        function renderStudentsTable() {
+            let tbody = document.getElementById('students-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = students.map((s, idx) => `
+                <tr>
+                    <td>${s.name}</td>
+                    <td>${s.email}</td>
+                    <td>${s.age}</td>
+                    <td>${s.gender === 'male' ? 'ذكر' : 'أنثى'}</td>
+                    <td><span style="background:rgba(59,130,246,0.2); padding:3px 8px; border-radius:4px; color:var(--secondary-color);">${s.category || 'غير محدد'}</span></td>
+                    <td>${s.subjects.join(', ')}</td>
+                    <td><strong style="color:var(--accent-color);">${s.remainingLessons || 0} حصة</strong></td>
+                    <td>
+                        <button class="btn" style="padding:4px 8px; background:var(--warning-color); width:auto; margin-left:5px;" onclick="editStudent(${s.id})">تعديل</button>
+                        <button class="btn" style="padding:4px 8px; background:var(--danger-color); width:auto;" onclick="students.splice(${idx},1);localStorage.setItem('aldar_students',JSON.stringify(students));renderStudentsTable();populateStudentSelect(students);">حذف</button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="8" style="text-align:center;">لا توجد بيانات طلاب مسجلة</td></tr>';
+        }
+
+        function recordPayment() {
+            const studentId = parseInt(document.getElementById('pay-student-select').value);
+            const amount = parseFloat(document.getElementById('pay-amount').value);
+            const channel = document.getElementById('pay-channel').value;
+            
+            if(!studentId || !amount || isNaN(amount)) { alert('يرجى اختيار الطالب وإدخال المبلغ الصحيح'); return; }
+            let addedLessons = Math.floor(amount / 125); 
+
+            let student = students.find(s => s.id === studentId);
+            if(student) {
+                student.remainingLessons = (student.remainingLessons || 0) + addedLessons;
+                localStorage.setItem('aldar_students', JSON.stringify(students));
+            }
+
+            payments.push({ studentId, amount, channel, addedLessons, date: new Date().toLocaleDateString('ar-EG') });
+            localStorage.setItem('aldar_payments', JSON.stringify(payments));
+
+            document.getElementById('pay-amount').value = '';
+            alert(`تم تسجيل الدفع بنجاح! وتمت إضافة ${addedLessons} حصة رصيد إضافي لحساب الطالب تلقائياً.`);
+            initAppData();
+        }
+
+        function renderFinancials() {
+            let totalSalaries = 0;
+            let salTbl = document.getElementById('salaries-table-body');
+            if(salTbl) {
+                salTbl.innerHTML = teachers.map(t => {
+                    let subNames = t.subjects.map(s => s.name).join('، ');
+                    let estSalary = t.subjects.reduce((sum, s) => sum + parseFloat(s.price || 0) * 16, 0); 
+                    totalSalaries += estSalary;
+                    return `<tr><td>${t.name}</td><td>${subNames}</td><td>${estSalary} ج.م</td></tr>`;
+                }).join('') || '<tr><td colspan="3" style="text-align:center;">لا توجد بيانات معلمين لحساب الرواتب</td></tr>';
+            }
+
+            let totalIncome = payments.reduce((sum, p) => sum + p.amount, 0);
+            let channelTotals = {};
+            payments.forEach(p => { channelTotals[p.channel] = (channelTotals[p.channel] || 0) + p.amount; });
+
+            let incVal = document.getElementById('total-income-val');
+            if(incVal) incVal.innerText = totalIncome + ' ج.م';
+            let salVal = document.getElementById('total-salaries-val');
+            if(salVal) salVal.innerText = totalSalaries + ' ج.م';
+            let netVal = document.getElementById('net-profit-val');
+            if(netVal) netVal.innerText = (totalIncome - totalSalaries) + ' ج.م';
+
+            let chHtml = '';
+            for(let ch in channelTotals) { chHtml += `<p><strong>${ch}:</strong> ${channelTotals[ch]} ج.م</p>`; }
+            let chBreak = document.getElementById('channel-breakdown');
+            if(chBreak) chBreak.innerHTML = chHtml || '<p>لا توجد مدفوعات مسجلة بعد.</p>';
+        }
+
+        function executeSmartSearch() {
+            const sub = document.getElementById('search-subject-select').value;
+            const cat = document.getElementById('search-category-select').value;
+            
+            let searchCriteria = [];
+            document.querySelectorAll('.search-criteria-row').forEach(row => {
+                let day = row.querySelector('.search-day-select').value;
+                let timeStr = row.querySelector('.search-time-input').value.trim().toLowerCase();
+                if(day) searchCriteria.push({ day, timeStr });
+            });
+
+            // الاعتماد الآن على المواعيد الحقيقية التي أدخلها المعلمون بأنفسهم في نظام المواعيد (teacherSchedules)
+            let filtered = teachers.filter(t => {
+                let matchSub = t.subjects.some(s => s.name === sub);
+                let matchCat = t.categories && t.categories.includes(cat);
+                if(!matchSub || !matchCat) return false;
+
+                if(searchCriteria.length > 0) {
+                    let myScheds = teacherSchedules.filter(s => s.teacherEmail.toLowerCase() === t.email.toLowerCase());
+                    let matchesAny = searchCriteria.some(crit => {
+                        return myScheds.some(ms => ms.day === crit.day && (crit.timeStr === '' || ms.time.toLowerCase().includes(crit.timeStr)));
+                    });
+                    return matchesAny;
+                }
+                return true;
+            });
+
+            let resDict = document.getElementById('search-results');
+            if(!resDict) return;
+            if(filtered.length === 0) { 
+                resDict.innerHTML = '<p style="color:var(--danger-color);">لا توجد نتائج مطابقة للمعلمين بالمواصفات والأوقات التي حددها المعلمون بأنفسهم.</p>'; 
+                return; 
+            }
+
+            resDict.innerHTML = '<ul>' + filtered.map(t => {
+                let tScheds = teacherSchedules.filter(s => s.teacherEmail.toLowerCase() === t.email.toLowerCase());
+                let schedStr = tScheds.length > 0 ? tScheds.map(s => s.day + ' (' + s.time + ')').join('، ') : 'لم يحدد مواعيد بعد';
+                return `
+                <li style="margin:10px 0; background:rgba(255,255,255,0.03); padding:12px; border-radius:6px; border-right: 4px solid var(--accent-color);">
+                    <strong>${t.name}</strong><br>
+                    - المواعيد المتاحة المحددة منه: <span style="color:var(--warning-color);">${schedStr}</span><br>
+                    - الفئات المستهدفة: ${t.categories.join('، ')}<br>
+                    - الجوال: ${t.phone} | ${t.zoomLink ? '<a href="'+t.zoomLink+'" target="_blank">رابط زوم</a>' : ''}
+                </li>`;
+            }).join('') + '</ul>';
+        }
+    </script>
+</body>
+</html>

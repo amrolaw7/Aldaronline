@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الطالب - الدار أونلاين</title>
+    <!-- إضافة اللوجو كأيقونة للمتصفح -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+            direction: rtl;
+            position: relative;
+        }
+
+        /* العلامة المائية الخلفية الموحدة للنظام كله */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 450px;
+            background: url('logo.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #login-screen, #app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background-color: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color);
+        }
+
+        #app-container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        sidebar {
+            width: 275px;
+            background-color: var(--card-bg);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-header img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 10px 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: var(--text-muted);
+            font-size: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .sidebar-menu li:hover, .sidebar-menu li.active {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--text-color);
+            border-right: 4px solid var(--secondary-color);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-box h4 {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .stat-box p {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            sidebar { width: 100%; height: auto; }
+            .sidebar-menu { display: flex; flex-wrap: wrap; gap: 5px; padding: 10px; }
+            .sidebar-menu li { padding: 8px 12px; font-size: 13px; border-bottom: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة دخول الطالب -->
+    <div id="login-screen">
+        <div class="login-card">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <img src="logo.png" alt="اللوجو" style="width: 50px; height: 50px; object-fit: contain;">
+            </div>
+            <h2>تسجيل دخول الطالب</h2>
+            <div class="form-group">
+                <label>البريد الإلكتروني:</label>
+                <input type="email" id="student-login-email" placeholder="student@aldar.com">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور:</label>
+                <input type="password" id="student-login-pass" placeholder="كلمة المرور">
+            </div>
+            <button class="btn" onclick="handleStudentLogin()">دخول لوحة الطالب</button>
+        </div>
+    </div>
+
+    <!-- لوحة تحكم الطالب -->
+    <div id="app-container" style="display: none;">
+        <sidebar>
+            <div class="sidebar-header">
+                <img src="logo.png" alt="اللوجو">
+                <span>الدار أونلاين</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li onclick="switchSection('student-home', this)" class="active">🏠 الرئيسية ورصيد الحصص</li>
+                <li onclick="studentLogout()" style="color: var(--danger-color); margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">🚪 تسجيل الخروج</li>
+            </ul>
+        </sidebar>
+
+        <main>
+            <section id="student-home" class="section-content active">
+                <div class="card">
+                    <h3 id="welcome-student-title">مرحباً بك</h3>
+                    <div class="stat-box">
+                        <h4>رصيد الحصص المتبقية لديك</h4>
+                        <p id="student-lessons-count">0 حصة</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">
+                        <h4 style="color: var(--secondary-color); margin-bottom: 8px;">المواد المشترك بها:</h4>
+                        <p id="student-subjects-list" style="font-size: 16px; color: var(--text-muted);">-</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let currentStudent = null;
+
+        function handleStudentLogin() {
+            let email = document.getElementById('student-login-email').value.trim();
+            let pass = document.getElementById('student-login-pass').value.trim();
+            let students = JSON.parse(localStorage.getItem('aldar_students')) || [];
+
+            let found = students.find(s => s.email === email && s.password === pass);
+            if(found) {
+                currentStudent = found;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                loadStudentData();
+            } else {
+                alert('البريد الإلكتروني أو كلمة المرور غير صحيحة!');
+            }
+        }
+
+        function loadStudentData() {
+            // تحديث بيانات الطالب الحالية من الـ LocalStorage مباشرة لضمان رؤية الرصيد الجديد المحدث من الأدمن
+            let students = JSON.parse(localStorage.getItem('aldar_students')) || [];
+            let latestStudent = students.find(s => s.id === currentStudent.id);
+            if(latestStudent) currentStudent = latestStudent;
+
+            document.getElementById('welcome-student-title').innerText = `مرحباً بك، ${currentStudent.name}`;
+            document.getElementById('student-lessons-count').innerText = `${currentStudent.remainingLessons || 0} حصة`;
+            document.getElementById('student-subjects-list').innerText = currentStudent.subjects ? currentStudent.subjects.join(' - ') : 'لا توجد مواد';
+        }
+
+        function switchSection(sectionId, element) {
+            document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            element.classList.add('active');
+            if(sectionId === 'student-home') loadStudentData();
+        }
+
+        function studentLogout() {
+            currentStudent = null;
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('app-container').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
